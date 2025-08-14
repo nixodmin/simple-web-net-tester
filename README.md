@@ -49,6 +49,41 @@ my-venv/bin/python3 app.py
 - Вы можете изменить список разрешенных сетей в файле `app.py` (переменная `ALLOWED_NETWORKS`).
 - Для безопасности используйте reverse-proxy для доступа к сервису
 
+## пример конфига с минимальными расхождениями в замерах скорости для reverse-proxy на базе nginx
+```
+server {
+    listen 80 reuseport so_keepalive=on; # Стандартный 80 порт для web сервера
+    server_name ВАШ_ДОМЕН_ИЛИ_IP;
+
+    client_max_body_size 0;       # Выключаем проверку размера (для потоковых данных)
+    tcp_nodelay on;               # Отключаем алгоритм Нейгла (иначе можем получить разницу в скорости до 30% от чистой работы скрипта на Flask
+    underscores_in_headers on;    # Разрешаем подчёркивания в заголовках (на всякий случай)
+
+    location / {
+        proxy_pass http://127.0.0.1:5080;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+
+        # Полное отключение буферизации
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_cache off;
+    }
+
+    # Дополнительные настройки для upload
+    location /speedtest/upload {
+        # Явно дублируем настройки из location / (для гарантии)
+        proxy_pass http://127.0.0.1:5080;
+        proxy_http_version 1.1;
+        proxy_buffering off;
+        proxy_request_buffering off;
+    }
+}
+```
+
+
 ## Технические детали
 - Серверная часть: Flask (Python)
 - Клиентская часть: HTML5, CSS3, JavaScript
