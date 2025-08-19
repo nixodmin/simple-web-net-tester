@@ -265,7 +265,7 @@
             }
 
             const duration = (performance.now() - startTime) / 1000; // в секундах
-            const speedMbps = (totalBytes * 8) / (1000 * 1000) / duration; // используем 1000, а не 1024 для Мбит/с
+            const speedMbps = (totalBytes * 8) / (1024 * 1024) / duration; // используем 1000, а не 1024 для Мбит/с
             return Math.max(speedMbps, 0);
         }
 
@@ -296,7 +296,7 @@
                         break;
                     }
                 }
-
+https://github.com/nixodmin/simple-web-net-tester/blob/main/index.html
                 // Создаем Blob из всех блоков
                 const blob = new Blob(chunks, { type: 'application/octet-stream' });
 
@@ -316,7 +316,7 @@
 
                 // Используем реальные данные от сервера
                 const bytesReceived = result.total_bytes;
-                const speedMbps = (bytesReceived * 8) / (1000 * 1000) / result.duration_sec;
+                const speedMbps = (bytesReceived * 8) / (1024 * 1024) / result.duration_sec;
 
                 console.log(`Upload: ${bytesReceived} bytes in ${result.duration_sec}s = ${speedMbps.toFixed(2)} Mbps`);
                 return Math.max(speedMbps, 0);
